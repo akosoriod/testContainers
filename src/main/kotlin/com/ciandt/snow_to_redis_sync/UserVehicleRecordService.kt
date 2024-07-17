@@ -81,6 +81,7 @@ class UserVehicleRecordService(
     }
 
     fun getRedisInfo(): String {
+        logger.info("Fetching Redis info")
         redisClient.connect().use { redisConnection ->
             val redisCommands = redisConnection.sync()
             return redisCommands.info()
@@ -88,6 +89,7 @@ class UserVehicleRecordService(
     }
 
     fun flushAll(): String {
+        logger.info("Flushing all data from Redis")
         redisClient.connect().use { redisConnection ->
             val redisCommands = redisConnection.sync()
             redisCommands.flushall()
