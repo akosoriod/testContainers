@@ -1,20 +1,54 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# This app will sync snowflake tables data to a REDIS cache
+At the moment it simply dumps all records from a table and add them to REDIS using a transaction
+# Dev setup steps
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+## Install dependencies
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+### Java 17
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+### Gradle
+https://docs.gradle.org/current/userguide/installation.html
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+### Kotlin compiler
+https://github.com/JetBrains/kotlin/releases/download/v2.0.0/kotlin-compiler-2.0.0.zip
+
+## Set up snowflake connection auth vars
+
+Simply export this variables in your local env, set appropriate values:
+```
+export SNOWFLAKE_ACCOUNT_NAME="jruyegl-wpb53391"
+export SNOWFLAKE_DB_NAME="SAMPLE_DB"
+export SNOWFLAKE_WAREHOUSE_NAME="COMPUTE_WH"
+export SNOWFLAKE_ROLE_NAME="DEVELOPER"
+export SNOWFLAKE_USERNAME="username"
+export SNOWFLAKE_PASSWORD="password"
+export SNOWFLAKE_TABLE_NAME="USER_VEHICLE_DATA"
+```
+
+**Before running the program with those env vars you can test a connection using snowsql CLI tool**
+
+## Set up and run REDIS in local machine
+
+### Install docker
+
+### Install redis-tools
+```
+sudo apt install redis-tools
+```
+
+### Run redis container
+```
+docker run --name redis -p 6379:6379 -d redis
+```
+
+## Test local app
+
+### Start spring app
+```
+./gradlew bootRun
+```
+
+### Send commands to app ennpoints
+```
+curl http://localhost:8080/api/v1/sync
+```
