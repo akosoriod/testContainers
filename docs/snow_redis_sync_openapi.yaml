@@ -1,0 +1,212 @@
+openapi: 3.0.0
+info:
+  title: Snowflake-Redis Sync API
+  description: API service to sync data between Snowflake and Redis, show Redis general info, and flush Redis data.
+  version: 1.0.0
+
+servers:
+  - description: Sync Function API 
+    url: https://SyncAPI.azurewebsites.net/api
+
+paths:
+  /sync:
+    post:
+      summary: Sync data from Snowflake to Redis
+      description: Initiate the data synchronization process from Snowflake to Redis.
+      requestBody:
+        description: Details of the synchronization process
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncRequest'
+      responses:
+        '200':
+          description: Data synchronized successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Data synchronized successfully"
+        '204':
+          description: No content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is not content available for this request"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "An error occurred while syncing data"
+
+  /info:
+    post:
+      summary: Get Redis general info
+      description: Retrieve general information about the Redis database, including the amount of rows and recent updates.
+      requestBody:
+        description: Details of the request to fetch Redis general info
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InfoRequest'
+      responses:
+        '200':
+          description: Redis general information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rowCount:
+                    type: integer
+                    example: 1500
+                  lastUpdate:
+                    type: string
+                    format: date-time
+                    example: "2023-10-04T12:34:56Z"
+                  enviroment:
+                    type: string
+                    example: "dev"
+                  schema:
+                    type: string
+                    example: "target.schema"
+                  snowflakeTable:
+                    type: string
+                    example: "target_table_name"
+        '204':
+          description: No content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is not content available for this request"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "An error occurred while retrieving Redis info"
+
+  /flush:
+    post:
+      summary: Delete all data from Redis
+      description: Remove all data from the Redis database.
+      requestBody:
+        description: Details of the request to flush all data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlushRequest'
+      responses:
+        '200':
+          description: Redis data flushed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "All data flushed from Redis successfully"
+                  schema:
+                    type: string
+                    example: "target.schema"
+        '204':
+          description: No content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is not content available for this request"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "An error occurred while flushing Redis data"
+
+components:
+  schemas:
+    SyncRequest:
+      type: object
+      properties:
+        schema:
+          type: string
+          example: "target.schema"
+        snowflakeTable:
+          type: string
+          example: "target_table_name"
+        redisKeyPrefix:
+          type: string
+          example: "prefix"
+      required:
+        - schema
+        - snowflakeTable
+        - redisKeyPrefix
+    
+    InfoRequest:
+      type: object
+      properties:
+        schema:
+          type: string
+          example: "target.schema"
+        snowflakeTable:
+          type: string
+          example: "target_table_name"
+        redisKeyPrefix:
+          type: string
+          example: "prefix"
+      required:
+        - schema
+        - snowflakeTable
+        - redisKeyPrefix
+
+    FlushRequest:
+      type: object
+      properties:
+        schema:
+          type: string
+          example: "target.schema"
+        snowflakeTable:
+          type: string
+          example: "target_table_name"
+        redisKeyPrefix:
+          type: string
+          example: "prefix"
+        confirm:
+          type: boolean
+          example: true
+      required:
+        - schema
+        - snowflakeTable
+        - redisKeyPrefix
+        - confirm
