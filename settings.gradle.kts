@@ -1,1 +1,1 @@
-rootProject.name = "snow_to_redis_sync"
+rootProject.name = "databroker_sf_redis_sync"

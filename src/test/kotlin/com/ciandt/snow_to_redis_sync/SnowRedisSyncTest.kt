@@ -1,4 +1,4 @@
-package com.ciandt.snow_to_redis_sync
+package com.eds.dtbroker.databroker_sf_redis_sync
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

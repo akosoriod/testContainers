@@ -1,4 +1,4 @@
-package com.ciandt.snow_to_redis_sync
+package com.eds.dtbroker.databroker_sf_redis_sync
 
 import io.lettuce.core.RedisClient
 import kotlinx.serialization.Serializable
@@ -14,7 +14,7 @@ import java.sql.ResultSet
 import java.util.Properties
 
 @Service
-class UserVehicleRecordService(
+class SyncService(
     @Value("\${snowflake.accountName}") private val accountName: String,
     @Value("\${snowflake.dbName}") private val dbName: String,
     @Value("\${snowflake.schemaName:PUBLIC}") private val schemaName: String,
@@ -25,7 +25,7 @@ class UserVehicleRecordService(
     @Value("\${snowflake.tableName}") private val tableName: String,
     private val redisClient: RedisClient
 ) {
-    private val logger = LoggerFactory.getLogger(UserVehicleRecordService::class.java)
+    private val logger = LoggerFactory.getLogger(SyncService::class.java)
 
     fun syncData() {
         try {

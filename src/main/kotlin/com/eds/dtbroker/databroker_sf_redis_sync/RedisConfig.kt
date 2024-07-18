@@ -1,4 +1,4 @@
-package com.ciandt.snow_to_redis_sync
+package com.eds.dtbroker.databroker_sf_redis_sync
 
 import io.lettuce.core.RedisClient
 import org.springframework.beans.factory.annotation.Value

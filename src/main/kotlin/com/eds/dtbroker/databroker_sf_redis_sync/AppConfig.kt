@@ -1,4 +1,4 @@
-package com.ciandt.snow_to_redis_sync
+package com.eds.dtbroker.databroker_sf_redis_sync
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.PropertySource
