@@ -1,4 +1,4 @@
-package com.eds.dtbroker.databroker_sf_redis_sync
+package com.eds.dtbroker.sync
 
 import io.lettuce.core.RedisClient
 import org.springframework.beans.factory.annotation.Value

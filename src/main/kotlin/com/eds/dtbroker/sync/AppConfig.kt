@@ -1,4 +1,4 @@
-package com.eds.dtbroker.databroker_sf_redis_sync
+package com.eds.dtbroker.sync
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.PropertySource

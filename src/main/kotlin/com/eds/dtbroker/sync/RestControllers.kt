@@ -1,4 +1,4 @@
-package com.eds.dtbroker.databroker_sf_redis_sync
+package com.eds.dtbroker.sync
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
