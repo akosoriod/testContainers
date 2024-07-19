@@ -1,23 +1,51 @@
 package com.eds.dtbroker.sync
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
+import java.sql.ResultSet
 
 @Repository
 class SnowflakeRepository(
-    val jdbcTemplate: NamedParameterJdbcTemplate,
+    private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+    private val jdbcTemplate: JdbcTemplate,
+    private val objectMapper: ObjectMapper
 ) {
+
+    @Value("\${snowflake.warehouse}")
+    private lateinit var warehouse: String
+
+    @Value("\${snowflake.db}")
+    private lateinit var database: String
+
     // Get all records from a sync table
     fun getAllRecords(schema: String, table: String): List<String> {
-        // TODO implement query logic
-        val sql = "select * from $schema.$table;"
+        val useWarehouseSql = "USE WAREHOUSE $warehouse;"
+        val useDatabaseSql = "USE DATABASE $database;"
+        val useSchemaSql = "USE SCHEMA $schema;"
+        val selectSql = "SELECT * FROM $schema.$table;"
 
-        // val records = jdbcTemplate.query(sql) { row, _ ->
-        //     // unpack columns
-        //     // convert to JSON
-        // }
+        // // Execute USE statements before the main query
+        // jdbcTemplate.execute(useWarehouseSql)
+        // jdbcTemplate.execute(useDatabaseSql)
+        // jdbcTemplate.execute(useSchemaSql)
 
-        // Returning an empty list of strings as a mock implementation
-        return emptyList()
+        return namedParameterJdbcTemplate.query(selectSql) { rs, _ -> mapRowToJsonString(rs) }
+    }
+
+    private fun mapRowToJsonString(rs: ResultSet): String {
+        val metaData = rs.metaData
+        val columnCount = metaData.columnCount
+        val jsonNode = objectMapper.createObjectNode()
+
+        for (i in 1..columnCount) {
+            val columnName = metaData.getColumnName(i)
+            val columnValue = rs.getObject(i)
+            jsonNode.putPOJO(columnName, columnValue)
+        }
+
+        return jsonNode.toString()
     }
 }

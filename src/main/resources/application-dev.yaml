@@ -1,7 +1,7 @@
 snowflake:
   account: "jruyegl-wpb53391"
-  warehouse: "COMPUTE-WH"
-  db: "${SNOWFLAKE_DB_NAME:SAMPLE-DB}"
+  warehouse: "COMPUTE_WH"
+  db: "${SNOWFLAKE_DB_NAME:SAMPLE_DB}"
   schema: "${SNOWFLAKE_SCHEMA:PUBLIC}"
   role: "DEVELOPER"
 
