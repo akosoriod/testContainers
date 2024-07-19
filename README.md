@@ -43,6 +43,12 @@ docker run --name redis -p 6379:6379 -d redis
 
 ## Test local app
 
+### Copy application env specifics configs to application.yaml file
+For instance to aply the DEV configs
+```
+cp src/main/resources/application-dev.yaml src/main/resources/application.yaml
+```
+
 ### Start spring app
 ```
 ./gradlew bootRun

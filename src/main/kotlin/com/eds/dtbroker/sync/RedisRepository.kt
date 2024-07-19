@@ -9,7 +9,7 @@ class RedisRepository(
 ){
 
     // Adds a list of JSON records to REDIS 
-    fun addRecordsToCache(List<String>){
+    fun addRecordsToCache(records : List<String>){
         //TODO implement redis operations logic here
         redisTemplate.opsForValue()
     }
