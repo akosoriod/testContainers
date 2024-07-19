@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: dtbroker-sf-redis-api
-          image: @{CRSERVER}@/dtbroker-api:@{Release.ReleaseName}@
+          image: @{CRSERVER}@/dtbroker-sf-redis-api:@{Release.ReleaseName}@
           ports: 
             - containerPort: 8080
           env:
