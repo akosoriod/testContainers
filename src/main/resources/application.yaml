@@ -1,0 +1,18 @@
+snowflake:
+  account: "jruyegl-wpb53391"
+  warehouse: "COMPUTE_WH"
+  db: "${SNOWFLAKE_DB_NAME:SAMPLE_DB}"
+  schema: "${SNOWFLAKE_SCHEMA:PUBLIC}"
+  role: "DEVELOPER"
+
+spring:
+  data:
+    redis:
+      host: redis-dtbroker-dev.westus2.redisenterprise.cache.azure.net
+      password: ${REDIS_ACCESS_KEY}
+      port: ${REDIS_CONTAINER_PORT:6379}
+  datasource:
+    username: "${SNOWFLAKE_USERNAME}"
+    password: ${SNOWFLAKE_PASSWORD}
+    driver-class-name: "net.snowflake.client.jdbc.SnowflakeDriver"
+    url: "jdbc:snowflake://${snowflake.account}.snowflakecomputing.com/?warehouse=${snowflake.warehouse}&db=${snowflake.db}&schema=${snowflake.schema}&role=${snowflake.role}&TIMEZONE=UTC&CLIENT_RESULT_COLUMN_CASE_INSENSITIVE=true&CLIENT_TIMESTAMP_TYPE_MAPPING=TIMESTAMP_NTZ&JDBC_QUERY_RESULT_FORMAT=json"
