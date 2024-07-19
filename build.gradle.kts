@@ -6,7 +6,7 @@ plugins {
     kotlin("plugin.serialization") version "1.9.24"
 }
 
-group = "com.eds"
+group = "com.eds.dtbroker.sync"
 version = "0.0.1-SNAPSHOT"
 
 java {
