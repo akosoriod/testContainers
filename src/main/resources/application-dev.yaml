@@ -11,6 +11,8 @@ spring:
       host: redis-dtbroker-dev.westus2.redisenterprise.cache.azure.net
       password: ${REDIS_ACCESS_KEY}
       port: ${REDIS_CONTAINER_PORT:10000}
+      ssl:
+        enabled: true
   datasource:
     username: "${SNOWFLAKE_USERNAME}"
     password: ${SNOWFLAKE_PASSWORD}
