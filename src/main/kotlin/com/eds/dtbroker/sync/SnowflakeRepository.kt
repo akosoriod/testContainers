@@ -22,16 +22,7 @@ class SnowflakeRepository(
 
     // Get all records from a sync table
     fun getAllRecords(schema: String, table: String): List<String> {
-        val useWarehouseSql = "USE WAREHOUSE $warehouse;"
-        val useDatabaseSql = "USE DATABASE $database;"
-        val useSchemaSql = "USE SCHEMA $schema;"
         val selectSql = "SELECT * FROM $schema.$table;"
-
-        // // Execute USE statements before the main query
-        // jdbcTemplate.execute(useWarehouseSql)
-        // jdbcTemplate.execute(useDatabaseSql)
-        // jdbcTemplate.execute(useSchemaSql)
-
         return namedParameterJdbcTemplate.query(selectSql) { rs, _ -> mapRowToJsonString(rs) }
     }
 

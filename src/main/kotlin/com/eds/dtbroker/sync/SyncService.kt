@@ -16,6 +16,7 @@ class SyncService(
             val records = snowflake.getAllRecords(syncRequest.schema, syncRequest.snowflakeTable)
             val message = "Loaded ${records.size} records from Snowflake"
             logger.info(message)
+            redis.addRecordsToCache(records, syncRequest.redisKey)
             return message
         } catch (e: Exception) {
             logger.error("An error occurred: ${e.message}", e)
