@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: dtbroker-sf-redis-api
+  namespace: databroker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dtbroker-sf-redis-api
+  template:
+    metadata:
+      labels:
+        app: dtbroker-sf-redis-api
+    spec:
+      containers:
+        - name: dtbroker-sf-redis-api
+          image: @{CRSERVER}@/dtbroker-api:@{Release.ReleaseName}@
+          ports: 
+            - containerPort: 8080
+          env:
+          - name: SNOWFLAKE_USERNAME
+            value: @{SF_UN}@
+          - name: SNOWFLAKE_PASSWORD
+            value: @{SF_PASS}@
+          - name: REDIS_ACCESS_KEY
+            value: @{REDIS_ACCESS_KEY}@
+          imagePullPolicy: Always    
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dtbroker-sf-redis-api
+  namespace: databroker
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: dtbroker-sf-redis-api
