@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.RedisCallback
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
-import org.springframework.transaction.annotation.Transactional
 
 @Repository
 class RedisRepository(
@@ -14,14 +13,10 @@ class RedisRepository(
 ) {
     private val logger = LoggerFactory.getLogger(RedisRepository::class.java)
 
-    @Transactional
     fun addRecordsToCache(records: List<String>, redisKey: String) {
-        val batchSize = 1000  // Adjust batch size as needed
-        var count = 0
+        val batchSize = 10000  // Adjust batch size as needed
 
         redisTemplate.executePipelined(RedisCallback { connection ->
-            connection.multi()  // Start the transaction
-
             try {
                 records.forEachIndexed { index, record ->
                     val jsonNode = objectMapper.readTree(record)
@@ -36,16 +31,13 @@ class RedisRepository(
                         logger.warn("Key '$redisKey' not found in record: $record")
                     }
 
-                    // Execute in batches
+                    // Optionally, execute in batches
                     if (index > 0 && index % batchSize == 0) {
-                        connection.exec()
-                        connection.multi()
+                        // Batch processing logic (not needed here as executePipelined handles batching internally)
                     }
                 }
-                connection.exec()  // Commit the remaining transactions
                 logger.info("Successfully added ${records.size} records to Redis.")
             } catch (e: Exception) {
-                connection.discard()  // Rollback the transaction
                 logger.error("An error occurred while adding records to Redis: ${e.message}", e)
             }
             null
