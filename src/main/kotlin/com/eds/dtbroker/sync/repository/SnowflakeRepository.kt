@@ -13,7 +13,7 @@ class SnowflakeRepository(
 
     // Get all records from a sync table
     fun getAllRecords(schema: String, table: String): List<String> {
-        val selectSql = "SELECT * FROM $schema.$table;"
+        val selectSql = "SELECT * FROM DIM_CUSTOMERMASTER limit 10;"
         return namedParameterJdbcTemplate.query(selectSql) { rs, _ -> mapRowToJsonString(rs) }
     }
 

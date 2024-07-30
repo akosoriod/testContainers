@@ -1,8 +1,8 @@
 snowflake:
   account: "lithia.west-us-2.azure"
   warehouse: "EDS_DEV_UAT_WH"
-  db: "${SNOWFLAKE_DB_NAME:MARKETING_DEV}"
-  schema: "${SNOWFLAKE_SCHEMA:STAGING}"
+  db: "DI_DEV"
+  schema: "CORE"
   role: "A_MKTG_SNOWFLAKE_DEV_DEVELOPER"
 
 spring:
