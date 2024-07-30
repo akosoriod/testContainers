@@ -30,10 +30,8 @@ class SyncService(
             }
 
             val recordsToCache = recordsWithKeys.map { it.second }
-            println("Records from snowflake")
-            println(recordsToCache)
             // Add records to Redis with the generated keys
-            //redis.addRecordsToCache(recordsToCache, syncRequest.redisKey)
+            redis.addRecordsToCache(recordsToCache, syncRequest.redisKey)
 
             message
         } catch (e: Exception) {
