@@ -1,5 +1,7 @@
-package com.eds.dtbroker.sync
+package com.eds.dtbroker.sync.resource
 
+import com.eds.dtbroker.sync.model.SyncRequest
+import com.eds.dtbroker.sync.service.SyncService
 import org.springframework.web.bind.annotation.*
 
 @RestController

@@ -1,4 +1,4 @@
-package com.eds.dtbroker.sync
+package com.eds.dtbroker.sync.model
 
 data class SyncRequest(
     val schema: String,

@@ -1,8 +1,6 @@
-package com.eds.dtbroker.sync
+package com.eds.dtbroker.sync.repository
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -10,15 +8,8 @@ import java.sql.ResultSet
 @Repository
 class SnowflakeRepository(
     private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-    private val jdbcTemplate: JdbcTemplate,
     private val objectMapper: ObjectMapper
 ) {
-
-    @Value("\${snowflake.warehouse}")
-    private lateinit var warehouse: String
-
-    @Value("\${snowflake.db}")
-    private lateinit var database: String
 
     // Get all records from a sync table
     fun getAllRecords(schema: String, table: String): List<String> {

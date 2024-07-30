@@ -27,9 +27,12 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
 
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("net.snowflake:snowflake-jdbc:3.16.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("org.bouncycastle:bcprov-jdk15to18:1.78.1")
+    implementation ("org.bouncycastle:bcpkix-jdk18on:1.78.1")
 	
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

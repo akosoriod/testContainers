@@ -1,4 +1,4 @@
-package com.eds.dtbroker.sync
+package com.eds.dtbroker.sync.repository
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
