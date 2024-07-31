@@ -19,12 +19,8 @@ spec:
           ports: 
             - containerPort: 8080
           env:
-          - name: SNOWFLAKE_USERNAME
-            value: @{SF_UN}@
-          - name: SNOWFLAKE_PASSWORD
-            value: @{SF_PASS}@
-          - name: REDIS_ACCESS_KEY
-            value: @{REDIS_ACCESS_KEY}@
+          - name: SPRING_PROFILES_ACTIVE
+            value: dev
           imagePullPolicy: Always    
       imagePullSecrets:
       - name: acr-secret

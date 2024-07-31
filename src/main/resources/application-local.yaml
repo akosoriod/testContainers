@@ -22,9 +22,6 @@ spring:
     driver-class-name: "net.snowflake.client.jdbc.SnowflakeDriver"
     url: "jdbc:snowflake://${snowflake.account}.snowflakecomputing.com/?warehouse=${snowflake.warehouse}&db=${snowflake.db}&schema=${snowflake.schema}&role=${snowflake.role}&TIMEZONE=UTC&CLIENT_RESULT_COLUMN_CASE_INSENSITIVE=true&CLIENT_TIMESTAMP_TYPE_MAPPING=TIMESTAMP_NTZ&JDBC_QUERY_RESULT_FORMAT=json"
 
-redis:
-  batch-size: 100000
-
 snowflake:
   account: "lithia.west-us-2.azure"
   warehouse: "EDS_DEV_UAT_WH"
@@ -35,9 +32,12 @@ snowflake:
   private-key-name: "snowflakePrivateKey"
   private-key-password: "snowflakePrivateKeyPassword"
 
+redis:
+  batch-size: 100000
+
 logging:
   level:
     com.azure: DEBUG
     com.microsoft: DEBUG
-    org.springframework.data.redis: DEBUG
-    io.lettuce.core: DEBUG
+    org.springframework.data.redis: INFO
+    io.lettuce.core: INFO

@@ -1,6 +1,13 @@
 package com.eds.dtbroker.sync.config
 
 import com.eds.dtbroker.sync.util.PrivateKeyLoader
+import com.azure.identity.DefaultAzureCredentialBuilder
+import com.azure.security.keyvault.secrets.SecretClient
+import com.azure.security.keyvault.secrets.SecretClientBuilder
+import com.azure.security.keyvault.secrets.models.KeyVaultSecret
+import com.azure.identity.AzureCliCredentialBuilder
+import com.azure.identity.ChainedTokenCredentialBuilder
+import com.azure.identity.ManagedIdentityCredentialBuilder
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.springframework.beans.factory.annotation.Value
@@ -15,47 +22,65 @@ import java.util.*
 import javax.sql.DataSource
 
 @Configuration
-class AppConfig {
+class AppConfig(
+    @Value("\${redisAccessKey}")
+    private val redisAccessKeyVault: String,
 
     @Value("\${spring.datasource.url}")
-    private lateinit var url: String
+    private val url: String,
 
-    @Value("\${spring.datasource.username}")
-    private lateinit var username: String
+    @Value("\${snowflake.user}")
+    private val snowflakeUser: String,
 
-    //TODO: Read private key contents and password from vault and remove these variables.
-    @Value("\${spring.datasource.private-key-path}")
-    private lateinit var privateKeyPath: String
+    @Value("\${snowflake.private-key-name}")
+    private val snowflakePrivateKeyName: String,
 
-    @Value("\${spring.datasource.private-key-password}")
-    private lateinit var privateKeyPassword: String
+    @Value("\${snowflake.private-key-password}")
+    private val snowflakePrivateKeyPassword: String,
+
+    @Value("\${spring.cloud.azure.keyvault.secret.property-sources[0].endpoint}")
+    private val keyVaultEndpoint: String
+) {
 
     @Bean
-    fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, String> {
-        val template = RedisTemplate<String, String>()
-        template.connectionFactory = connectionFactory
-        template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = StringRedisSerializer()
-        return template
+    fun secretClient(): SecretClient {
+        val managedIdentityCredential = ManagedIdentityCredentialBuilder().build()
+        val azureCliCredential = AzureCliCredentialBuilder().build()
+
+        val chainedTokenCredential = ChainedTokenCredentialBuilder()
+            .addFirst(managedIdentityCredential)
+            .addLast(azureCliCredential)
+            .build()
+
+        return SecretClientBuilder()
+            .vaultUrl(keyVaultEndpoint)
+            .credential(chainedTokenCredential)
+            .buildClient()
     }
 
     @Bean
-    fun dataSource(): DataSource {
-        //TODO: Read private key contents and password from vault
-        val privateKey = PrivateKeyLoader.loadPrivateKey(privateKeyPath, privateKeyPassword)
-        val properties = Properties()
-        properties["user"] = username
-        properties["privateKey"] = privateKey
+    fun dataSource(secretClient: SecretClient): DataSource {
+        val keyVaultSecret: KeyVaultSecret = secretClient.getSecret(snowflakePrivateKeyName)
+        val privateKeyPem = keyVaultSecret.value
+
+        val privateKeyPassword = secretClient.getSecret(snowflakePrivateKeyPassword).value
+
+        val privateKey = PrivateKeyLoader.loadPrivateKey(privateKeyPem, privateKeyPassword)
+        val properties = Properties().apply {
+            put("user", snowflakeUser)
+            put("privateKey", privateKey)
+        }
 
         val driverManagerDataSource = DriverManagerDataSource(url, properties)
-        val config = HikariConfig()
-        config.dataSource = driverManagerDataSource
+        val config = HikariConfig().apply {
+            dataSource = driverManagerDataSource
+        }
 
         return HikariDataSource(config)
     }
 
     @Bean
-    fun namedParameterJdbcTemplate(databrokerDS: DataSource): NamedParameterJdbcTemplate{
+    fun namedParameterJdbcTemplate(databrokerDS: DataSource): NamedParameterJdbcTemplate {
         return NamedParameterJdbcTemplate(databrokerDS)
     }
 }
