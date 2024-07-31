@@ -44,17 +44,11 @@ class AppConfig(
 
     @Bean
     fun secretClient(): SecretClient {
-        val managedIdentityCredential = ManagedIdentityCredentialBuilder().build()
-        val azureCliCredential = AzureCliCredentialBuilder().build()
-
-        val chainedTokenCredential = ChainedTokenCredentialBuilder()
-            .addFirst(managedIdentityCredential)
-            .addLast(azureCliCredential)
-            .build()
+        val defaultAzureCredential = DefaultAzureCredentialBuilder().build()
 
         return SecretClientBuilder()
             .vaultUrl(keyVaultEndpoint)
-            .credential(chainedTokenCredential)
+            .credential(defaultAzureCredential)
             .buildClient()
     }
 
