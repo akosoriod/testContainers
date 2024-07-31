@@ -29,8 +29,8 @@ snowflake:
   schema: "${SNOWFLAKE_SCHEMA:CORE}"
   role: "A_MKTG_SNOWFLAKE_DEV_DEVELOPER"
   user: "s_databroker_non_prod"
-  private-key-name: "snowflakePrivateKey"
-  private-key-password: "snowflakePrivateKeyPassword"
+  private-key-name: "${snowflakePrivateKey}"
+  private-key-password: "${snowflakePrivateKeyPassword}"
 
 redis:
   batch-size: 100000

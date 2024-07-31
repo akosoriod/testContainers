@@ -1,21 +1,11 @@
 package com.eds.dtbroker.sync.config
 
 import com.eds.dtbroker.sync.util.PrivateKeyLoader
-import com.azure.identity.DefaultAzureCredentialBuilder
-import com.azure.security.keyvault.secrets.SecretClient
-import com.azure.security.keyvault.secrets.SecretClientBuilder
-import com.azure.security.keyvault.secrets.models.KeyVaultSecret
-import com.azure.identity.AzureCliCredentialBuilder
-import com.azure.identity.ChainedTokenCredentialBuilder
-import com.azure.identity.ManagedIdentityCredentialBuilder
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.serializer.StringRedisSerializer
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DriverManagerDataSource
 import java.util.*
@@ -32,34 +22,16 @@ class AppConfig(
     @Value("\${snowflake.user}")
     private val snowflakeUser: String,
 
-    @Value("\${snowflake.private-key-name}")
+    @Value("\${snowflakePrivateKey}")
     private val snowflakePrivateKeyName: String,
 
-    @Value("\${snowflake.private-key-password}")
-    private val snowflakePrivateKeyPassword: String,
-
-    @Value("\${spring.cloud.azure.keyvault.secret.property-sources[0].endpoint}")
-    private val keyVaultEndpoint: String
+    @Value("\${snowflakePrivateKeyPassword}")
+    private val snowflakePrivateKeyPassword: String
 ) {
 
     @Bean
-    fun secretClient(): SecretClient {
-        val defaultAzureCredential = DefaultAzureCredentialBuilder().build()
-
-        return SecretClientBuilder()
-            .vaultUrl(keyVaultEndpoint)
-            .credential(defaultAzureCredential)
-            .buildClient()
-    }
-
-    @Bean
-    fun dataSource(secretClient: SecretClient): DataSource {
-        val keyVaultSecret: KeyVaultSecret = secretClient.getSecret(snowflakePrivateKeyName)
-        val privateKeyPem = keyVaultSecret.value
-
-        val privateKeyPassword = secretClient.getSecret(snowflakePrivateKeyPassword).value
-
-        val privateKey = PrivateKeyLoader.loadPrivateKey(privateKeyPem, privateKeyPassword)
+    fun dataSource(): DataSource {
+        val privateKey = PrivateKeyLoader.loadPrivateKey(snowflakePrivateKeyName, snowflakePrivateKeyPassword)
         val properties = Properties().apply {
             put("user", snowflakeUser)
             put("privateKey", privateKey)
