@@ -2,9 +2,9 @@ package com.eds.dtbroker.sync.config
 
 import com.eds.dtbroker.sync.util.PrivateKeyLoader
 import com.azure.identity.DefaultAzureCredentialBuilder
-import com.azure.security.keyvault.keys.KeyClient
-import com.azure.security.keyvault.keys.KeyClientBuilder
-import com.azure.security.keyvault.keys.models.KeyVaultKey
+import com.azure.security.keyvault.secrets.SecretClient
+import com.azure.security.keyvault.secrets.SecretClientBuilder
+import com.azure.security.keyvault.secrets.models.KeyVaultSecret
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.springframework.beans.factory.annotation.Value
@@ -46,19 +46,19 @@ class AppConfig(
     }
 
     @Bean
-    fun keyClient(): KeyClient {
-        return KeyClientBuilder()
+    fun secretClient(): SecretClient {
+        return SecretClientBuilder()
             .vaultUrl(keyVaultEndpoint)
             .credential(DefaultAzureCredentialBuilder().build())
             .buildClient()
     }
 
     @Bean
-    fun dataSource(keyClient: KeyClient): DataSource {
-        val keyVaultKey: KeyVaultKey = keyClient.getKey(snowflakePrivateKeyName)
-        val privateKeyPem = keyVaultKey.key.toString()
+    fun dataSource(secretClient: SecretClient): DataSource {
+        val keyVaultSecret: KeyVaultSecret = secretClient.getSecret(snowflakePrivateKeyName)
+        val privateKeyPem = keyVaultSecret.value
 
-        val privateKeyPassword = snowflakePrivateKeyPassword  // Assuming the password is stored as a secret
+        val privateKeyPassword = secretClient.getSecret(snowflakePrivateKeyPassword).value
 
         val privateKey = PrivateKeyLoader.loadPrivateKey(privateKeyPem, privateKeyPassword)
         val properties = Properties().apply {

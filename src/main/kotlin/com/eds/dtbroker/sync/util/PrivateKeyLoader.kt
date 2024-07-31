@@ -8,21 +8,24 @@ import java.util.*
 
 object PrivateKeyLoader {
 
+
     init {
         Security.addProvider(BouncyCastleProvider())
     }
 
-    fun loadPrivateKey(privateKeyPem: String, privateKeyPassword: String): java.security.PrivateKey {
-        val privateKeyContent = privateKeyPem
-            .replace("\\n".toRegex(), "")
-            .replace("-----BEGIN PRIVATE KEY-----", "")
-            .replace("-----END PRIVATE KEY-----", "")
-            .trim()
+    fun loadPrivateKey(privateKeyPem: String, privateKeyPassword: String?): PrivateKey {
+        val pemParser = PEMParser(StringReader(privateKeyPem))
+        val converter = JcaPEMKeyConverter().setProvider("BC")
+        val obj = pemParser.readObject()
 
-        val encoded = Base64.getDecoder().decode(privateKeyContent)
-        val keySpec = PKCS8EncodedKeySpec(encoded)
-        val kf = KeyFactory.getInstance("RSA")
-
-        return kf.generatePrivate(keySpec)
+        return when (obj) {
+            is PEMEncryptedKeyPair -> {
+                val decryptorProvider = JcePEMDecryptorProviderBuilder().build(privateKeyPassword?.toCharArray())
+                val keyPair = obj.decryptKeyPair(decryptorProvider)
+                converter.getPrivateKey(keyPair.privateKeyInfo)
+            }
+            is PEMKeyPair -> converter.getPrivateKey(obj.privateKeyInfo)
+            else -> throw IllegalArgumentException("Unsupported key format")
+        }
     }
 }
