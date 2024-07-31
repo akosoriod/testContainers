@@ -23,10 +23,7 @@ class SyncService(
 
             // Generate Redis keys and prepare records for caching
             val recordsWithKeys = records.map { record ->
-                val jsonNode = ObjectMapper().readTree(record)
-                val userId = jsonNode.get("USERID")?.asText() ?: "0"
-                val key = "${syncRequest.redisKey}_${userId}"
-                Pair(key, record)
+                Pair(syncRequest.redisKey, record)
             }
 
             val recordsToCache = recordsWithKeys.map { it.second }

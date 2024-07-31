@@ -5,6 +5,9 @@ import com.azure.identity.DefaultAzureCredentialBuilder
 import com.azure.security.keyvault.secrets.SecretClient
 import com.azure.security.keyvault.secrets.SecretClientBuilder
 import com.azure.security.keyvault.secrets.models.KeyVaultSecret
+import com.azure.identity.AzureCliCredentialBuilder
+import com.azure.identity.ChainedTokenCredentialBuilder
+import com.azure.identity.ManagedIdentityCredentialBuilder
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.springframework.beans.factory.annotation.Value
@@ -20,6 +23,9 @@ import javax.sql.DataSource
 
 @Configuration
 class AppConfig(
+    @Value("\${redisAccessKey}")
+    private val redisAccessKeyVault: String,
+
     @Value("\${spring.datasource.url}")
     private val url: String,
 
@@ -37,19 +43,18 @@ class AppConfig(
 ) {
 
     @Bean
-    fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, String> {
-        val template = RedisTemplate<String, String>()
-        template.connectionFactory = connectionFactory
-        template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = StringRedisSerializer()
-        return template
-    }
-
-    @Bean
     fun secretClient(): SecretClient {
+        val managedIdentityCredential = ManagedIdentityCredentialBuilder().build()
+        val azureCliCredential = AzureCliCredentialBuilder().build()
+
+        val chainedTokenCredential = ChainedTokenCredentialBuilder()
+            .addFirst(managedIdentityCredential)
+            .addLast(azureCliCredential)
+            .build()
+
         return SecretClientBuilder()
             .vaultUrl(keyVaultEndpoint)
-            .credential(DefaultAzureCredentialBuilder().build())
+            .credential(chainedTokenCredential)
             .buildClient()
     }
 

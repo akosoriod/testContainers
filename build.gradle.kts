@@ -36,8 +36,6 @@ dependencies {
     implementation ("org.bouncycastle:bcpkix-jdk18on:1.78.1")
     implementation("com.azure.spring:spring-cloud-azure-starter-keyvault:5.14.0")
     implementation("com.azure:azure-security-keyvault-keys:4.3.3")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-
 	
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
