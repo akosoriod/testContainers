@@ -32,9 +32,12 @@ snowflake:
   private-key-name: "snowflakePrivateKey"
   private-key-password: "snowflakePrivateKeyPassword"
 
+redis:
+  batch-size: 100000
+
 logging:
   level:
     com.azure: DEBUG
     com.microsoft: DEBUG
-    org.springframework.data.redis: DEBUG
-    io.lettuce.core: DEBUG
+    org.springframework.data.redis: INFO
+    io.lettuce.core: INFO
