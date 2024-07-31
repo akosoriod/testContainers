@@ -1,10 +1,14 @@
 package com.eds.dtbroker.sync.util
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import java.security.KeyFactory
 import java.security.Security
-import java.security.spec.PKCS8EncodedKeySpec
-import java.util.*
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
+import org.bouncycastle.openssl.PEMParser
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
+import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder
+import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo
+import java.io.StringReader
+import java.security.PrivateKey
 
 object PrivateKeyLoader {
 
@@ -13,19 +17,20 @@ object PrivateKeyLoader {
         Security.addProvider(BouncyCastleProvider())
     }
 
-    fun loadPrivateKey(privateKeyPem: String, privateKeyPassword: String?): PrivateKey {
-        val pemParser = PEMParser(StringReader(privateKeyPem))
-        val converter = JcaPEMKeyConverter().setProvider("BC")
-        val obj = pemParser.readObject()
+    fun loadPrivateKey(privateKeyPem: String, privateKeyPassword: String): PrivateKey {
+       var privateKeyInfo: PrivateKeyInfo? = null
 
-        return when (obj) {
-            is PEMEncryptedKeyPair -> {
-                val decryptorProvider = JcePEMDecryptorProviderBuilder().build(privateKeyPassword?.toCharArray())
-                val keyPair = obj.decryptKeyPair(decryptorProvider)
-                converter.getPrivateKey(keyPair.privateKeyInfo)
-            }
-            is PEMKeyPair -> converter.getPrivateKey(obj.privateKeyInfo)
-            else -> throw IllegalArgumentException("Unsupported key format")
-        }
+       val pemParser = PEMParser(StringReader(privateKeyPem))
+       val pemObject = pemParser.readObject()
+
+       if (pemObject is PKCS8EncryptedPrivateKeyInfo) {
+           val pkcs8Prov = JceOpenSSLPKCS8DecryptorProviderBuilder().build(privateKeyPassword.toCharArray())
+           privateKeyInfo = pemObject.decryptPrivateKeyInfo(pkcs8Prov)
+       } else if (pemObject is PrivateKeyInfo) {
+           privateKeyInfo = pemObject as PrivateKeyInfo
+       }
+       pemParser.close()
+       val converter: JcaPEMKeyConverter = JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME)
+       return converter.getPrivateKey(privateKeyInfo)
     }
 }
