@@ -1,10 +1,3 @@
-snowflake:
-  account: "lithia.west-us-2.azure"
-  warehouse: "EDS_DEV_UAT_WH"
-  db: "DI_DEV"
-  schema: "CORE"
-  role: "A_MKTG_SNOWFLAKE_DEV_DEVELOPER"
-
 spring:
   data:
     redis:
@@ -32,8 +25,8 @@ spring:
 snowflake:
   account: "lithia.west-us-2.azure"
   warehouse: "EDS_DEV_UAT_WH"
-  db: "${SNOWFLAKE_DB_NAME:MARKETING_DEV}"
-  schema: "${SNOWFLAKE_SCHEMA:STAGING}"
+  db: "${SNOWFLAKE_DB_NAME:DI_DEV}"
+  schema: "${SNOWFLAKE_SCHEMA:CORE}"
   role: "A_MKTG_SNOWFLAKE_DEV_DEVELOPER"
   user: "s_databroker_non_prod"
   private-key-name: "snowflakePrivateKey"
