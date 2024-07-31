@@ -7,13 +7,14 @@ spring:
       ssl:
         enabled: true
   cloud:
-    azure:
+    azure:  
       keyvault:
         secret:
           property-sources:
             - endpoint: https://kv-db-wu2-d.vault.azure.net/
               credential:
-                azure-cli-enabled: true
+                managed-identity-enabled: true
+                client-id: a4f0a810-3f36-418d-afca-60e7cffd3422
   jpa:
     properties:
       hibernate:
