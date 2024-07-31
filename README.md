@@ -51,7 +51,7 @@ cp src/main/resources/application-dev.yaml src/main/resources/application.yaml
 
 ### Start spring app
 ```
-./gradlew bootRun
+./gradlew bootRun --args='--spring.profiles.active=local'
 ```
 
 ### Send commands to app ennpoints

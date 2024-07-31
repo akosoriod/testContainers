@@ -2,7 +2,7 @@ spring:
   data:
     redis:
       host: redis-dtbroker-dev.westus2.redisenterprise.cache.azure.net
-      password: ${REDIS_ACCESS_KEY}
+      password: ${redisAccessKey}
       port: ${REDIS_CONTAINER_PORT:10000}
       ssl:
         enabled: true
@@ -31,3 +31,10 @@ snowflake:
   user: "s_databroker_non_prod"
   private-key-name: "snowflakePrivateKey"
   private-key-password: "snowflakePrivateKeyPassword"
+
+logging:
+  level:
+    com.azure: INFO
+    com.microsoft: INFO
+    org.springframework.data.redis: INFO
+    io.lettuce.core: INFO
