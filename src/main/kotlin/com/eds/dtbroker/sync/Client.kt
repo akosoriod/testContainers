@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Entity
+
 data class Client(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
     @field:NotBlank val name: String,

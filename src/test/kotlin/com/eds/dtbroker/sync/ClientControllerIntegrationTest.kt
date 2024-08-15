@@ -1,5 +1,7 @@
 package com.eds.dtbroker.sync
 
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import jakarta.transaction.Transactional
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,12 +21,13 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.springframework.http.MediaType
 
 
-@SpringBootTest(classes = [YourMainApplicationClass::class])
+@SpringBootTest(classes = [TestContainer::class])
 @AutoConfigureMockMvc
 @Testcontainers
 @Transactional
 @ExtendWith(SpringExtension::class)
 class ClientControllerIntegrationTest {
+
 
     @Autowired
     private lateinit var userRepository: UserRepository
@@ -32,21 +35,42 @@ class ClientControllerIntegrationTest {
     @Autowired
     lateinit var mockMvc: MockMvc
 
-    @Container
-    private val postgreSQLContainer = PostgreSQLContainer<Nothing>("postgres:latest").apply {
-        withDatabaseName("integrationTest")
-        withUsername("user")
-        withPassword("password")
-        start()
-    }
+    @PersistenceContext
+    private lateinit var entityManager: EntityManager
 
-    @DynamicPropertySource
-    fun configureProperties(registry: DynamicPropertyRegistry) {
-        registry.add("spring.datasource.url") { postgreSQLContainer.jdbcUrl }
-        registry.add("spring.datasource.username") { postgreSQLContainer.username }
-        registry.add("spring.datasource.password") { postgreSQLContainer.password }
-    }
+    companion object {
+        // Declare the PostgreSQL container as a static member of the companion object
+        @Container
+        private val postgreSQLContainer = PostgreSQLContainer<Nothing>("postgres:latest").apply {
+            withDatabaseName("integrationTest")
+            withUsername("user")
+            withPassword("password")
+            start()
+        }
 
+        @JvmStatic
+        @DynamicPropertySource
+        fun configureProperties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.datasource.url") { postgreSQLContainer.jdbcUrl }
+            registry.add("spring.datasource.username") { postgreSQLContainer.username }
+            registry.add("spring.datasource.password") { postgreSQLContainer.password }
+        }
+    }
+    @BeforeEach
+    fun setUp() {
+        // Create the client table using a raw SQL statement
+        entityManager.createNativeQuery(
+            """
+            CREATE TABLE IF NOT EXISTS client (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL UNIQUE
+            )
+            """.trimIndent()
+        ).executeUpdate()
+
+        userRepository.deleteAll()
+    }
     @Test
     fun `should return all users`() {
         mockMvc.get("/users")
