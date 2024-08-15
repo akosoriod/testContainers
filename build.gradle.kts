@@ -23,6 +23,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-json")
+    implementation("org.postgresql:postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
 
@@ -39,6 +41,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.1")
+    testImplementation("org.testcontainers:postgresql:1.20.1")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
 }
 
 kotlin {
