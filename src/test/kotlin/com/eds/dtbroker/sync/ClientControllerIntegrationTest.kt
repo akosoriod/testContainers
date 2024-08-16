@@ -21,16 +21,16 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.springframework.http.MediaType
 
 
-@SpringBootTest(classes = [TestContainer::class])
 @AutoConfigureMockMvc
 @Testcontainers
 @Transactional
 @ExtendWith(SpringExtension::class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ClientControllerIntegrationTest {
 
 
-    @Autowired
-    private lateinit var userRepository: UserRepository
+//    @Autowired
+//    private lateinit var userRepository: UserRepository
 
     @Autowired
     lateinit var mockMvc: MockMvc
@@ -39,7 +39,6 @@ class ClientControllerIntegrationTest {
     private lateinit var entityManager: EntityManager
 
     companion object {
-        // Declare the PostgreSQL container as a static member of the companion object
         @Container
         private val postgreSQLContainer = PostgreSQLContainer<Nothing>("postgres:latest").apply {
             withDatabaseName("integrationTest")
@@ -69,7 +68,7 @@ class ClientControllerIntegrationTest {
             """.trimIndent()
         ).executeUpdate()
 
-        userRepository.deleteAll()
+       // userRepository.deleteAll()
     }
     @Test
     fun `should return all users`() {

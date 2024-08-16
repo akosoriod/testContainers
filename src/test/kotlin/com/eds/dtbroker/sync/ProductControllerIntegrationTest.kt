@@ -1,13 +1,11 @@
 package com.eds.dtbroker.sync
 
-import org.junit.jupiter.api.BeforeEach
+import jakarta.transaction.Transactional
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
@@ -16,11 +14,16 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.containers.GenericContainer
 import org.springframework.http.MediaType
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
+import org.testcontainers.containers.wait.strategy.Wait
+import kotlin.time.Duration
 
-@SpringBootTest(classes = [TestContainer::class])
 @AutoConfigureMockMvc
 @Testcontainers
+@Transactional
 @ExtendWith(SpringExtension::class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProductControllerIntegrationTest {
 
     @Autowired
@@ -29,16 +32,22 @@ class ProductControllerIntegrationTest {
     @Autowired
     lateinit var mockMvc: MockMvc
 
-    @Container
-    private val redisContainer = GenericContainer<Nothing>("redis:latest").apply {
-        withExposedPorts(6379   )
+    companion object {
+        @Container
+        val redisContainer = GenericContainer<Nothing>("redis:latest").apply {
+            withExposedPorts(6000)
+            withCommand("redis-server --port 6000")
+        }
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun properties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.data.redis.host") { redisContainer.host }
+            registry.add("spring.data.redis.port") { redisContainer.getMappedPort(6000) } // Map to the exposed port
+        }
     }
 
 
-    @BeforeEach
-    fun setUp() {
-        productRepository.deleteAll()
-    }
 
     @Test
     fun `should return all products`() {
@@ -61,5 +70,11 @@ class ProductControllerIntegrationTest {
             jsonPath("$.name") { value("Product A") }
             jsonPath("$.price") { value(10.0) }
         }
+
+        // Optionally verify the product was saved
+        val savedProduct = productRepository.findById("1")
+        assert(savedProduct.isPresent)
+        assert(savedProduct.get().name == "Product A")
+        assert(savedProduct.get().price == 10.0)
     }
 }
