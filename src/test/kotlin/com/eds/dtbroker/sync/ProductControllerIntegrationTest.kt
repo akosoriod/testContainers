@@ -17,7 +17,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.containers.GenericContainer
 import org.springframework.http.MediaType
 
-@SpringBootTest
+@SpringBootTest(classes = [TestContainer::class])
 @AutoConfigureMockMvc
 @Testcontainers
 @ExtendWith(SpringExtension::class)
@@ -31,14 +31,13 @@ class ProductControllerIntegrationTest {
 
     @Container
     private val redisContainer = GenericContainer<Nothing>("redis:latest").apply {
-        withExposedPorts(6223   )
+        withExposedPorts(6379   )
     }
 
 
     @BeforeEach
     fun setUp() {
-        // Limpiar datos existentes
-    //    productRepository.deleteAll()
+        productRepository.deleteAll()
     }
 
     @Test
